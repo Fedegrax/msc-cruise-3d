@@ -47,7 +47,12 @@ deckList.innerHTML = DECKS.slice().reverse().map((d) => `
 const stage = await createStage(canvas);
 const { camera, scene } = stage;
 const spaces = setupSpaces(stage);
-camera.position.set(250, 80, 215);
+// Su schermi stretti (telefono in verticale) la camera si allontana per far stare la nave.
+const fit = (pos, target) => {
+  const k = Math.max(1, 1.4 / camera.aspect);
+  return pos.map((v, i) => target[i] + (v - target[i]) * k);
+};
+camera.position.set(...fit([250, 80, 215], [10, 25, 0]));
 const controls = new OrbitControls(camera, canvas);
 controls.target.set(10, 25, 0);
 controls.enableDamping = true;
@@ -214,7 +219,10 @@ function toggleFull() {
   if (document.fullscreenElement) document.exitFullscreen();
   else viewer.requestFullscreen?.();
 }
-$('#view-select').addEventListener('change', (e) => flyTo(...VIEWS[e.target.value]));
+$('#view-select').addEventListener('change', (e) => {
+  const [pos, target] = VIEWS[e.target.value];
+  flyTo(fit(pos, target), target);
+});
 
 // ---------------------------------------------------------------------------
 // Video tour.
