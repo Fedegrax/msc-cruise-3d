@@ -205,7 +205,7 @@ export const TOUR_NODES = [
   {
     id: 'sundeck', name: 'Yacht Club Sundeck', deck: 22, pos: [80, 0], space: 'exterior', yaw: 0,
     area: 'Prua', links: ['pool-plage'],
-    hotspots: [{ at: [130, 30, 0], title: 'Vista di prua', text: 'Il solarium riservato dell’MSC Yacht Club, la “nave nella nave”.' }],
+    hotspots: [{ at: [150, 50, 0], title: 'Vista di prua', text: 'Il solarium riservato dell’MSC Yacht Club, la “nave nella nave”.' }],
   },
 ];
 
