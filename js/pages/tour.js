@@ -30,7 +30,9 @@ scene.add(photoSphere);
 const textureLoader = new THREE.TextureLoader();
 
 // Su schermi stretti si guarda un po' più in basso: le frecce restano sopra i pannelli.
-const BASE_PITCH = window.innerWidth < 700 ? -0.32 : -0.2;
+const NARROW = window.innerWidth < 700;
+const BASE_PITCH = NARROW ? -0.32 : -0.2;
+const ARROW_DIST = NARROW ? 4.6 : 3.6;
 const view = { yaw: 0, pitch: BASE_PITCH, fov: 75, vyaw: 0, vpitch: 0 };
 let node = null;
 let moving = null;
@@ -73,7 +75,7 @@ function buildArrows() {
     const to = byId[id];
     const a = dirTo(node, to);
     const g = new THREE.Group();
-    const pos = new THREE.Vector3(eye.x + Math.cos(a) * 3.6, floorY, eye.z + Math.sin(a) * 3.6);
+    const pos = new THREE.Vector3(eye.x + Math.cos(a) * ARROW_DIST, floorY, eye.z + Math.sin(a) * ARROW_DIST);
     const shade = new THREE.Mesh(chevronGeo, shadowMat);
     shade.scale.setScalar(1.15);
     shade.position.y = -0.01;
