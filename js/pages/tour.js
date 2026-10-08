@@ -29,7 +29,9 @@ photoSphere.visible = false;
 scene.add(photoSphere);
 const textureLoader = new THREE.TextureLoader();
 
-const view = { yaw: 0, pitch: -0.2, fov: 75, vyaw: 0, vpitch: 0 };
+// Su schermi stretti si guarda un po' più in basso: le frecce restano sopra i pannelli.
+const BASE_PITCH = window.innerWidth < 700 ? -0.32 : -0.2;
+const view = { yaw: 0, pitch: BASE_PITCH, fov: 75, vyaw: 0, vpitch: 0 };
 let node = null;
 let moving = null;
 
@@ -101,10 +103,11 @@ let hotspots = [];
 function buildHotspots() {
   overlay.querySelectorAll('.hotspot').forEach((e) => e.remove());
   hotspots = (node?.hotspots || []).map((h, i) => {
+    const open = i === 0 && window.innerWidth > 900;
     const wrap = document.createElement('div');
     wrap.className = 'hotspot';
-    wrap.innerHTML = `<button type="button" aria-expanded="${i === 0}" aria-label="Informazioni: ${h.title}">${ICONS.info}</button>
-      <div class="card-info"${i === 0 ? '' : ' hidden'}><b>${h.title}</b><span>${h.text}</span></div>`;
+    wrap.innerHTML = `<button type="button" aria-expanded="${open}" aria-label="Informazioni: ${h.title}">${ICONS.info}</button>
+      <div class="card-info"${open ? '' : ' hidden'}><b>${h.title}</b><span>${h.text}</span></div>`;
     const btn = wrap.querySelector('button');
     const card = wrap.querySelector('.card-info');
     btn.addEventListener('click', () => {
