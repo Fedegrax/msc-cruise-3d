@@ -55,7 +55,8 @@ export function deckPlanSVG(n, { zones = true, labels = true, nodes = true, curr
       const href = zoneHref?.(z);
       const parent = href ? el('a', { href, 'aria-label': `${z.name}: apri il tour 360°` }, g) : g;
       el('rect', { x: x0, y: z0, width: x1 - x0, height: z1 - z0, rx: 1.2, fill: ZONE_COLORS[z.kind][0], 'fill-opacity': 0.85, stroke: '#0a1a2f', 'stroke-width': 0.4 }, parent);
-      const cx = (x0 + x1) / 2;
+      // Numero sul lato di poppa dell'area: lascia libera la linea centrale con i punti del tour.
+      const cx = x1 - x0 > 12 ? x0 + 4.5 : (x0 + x1) / 2;
       const cz = (z0 + z1) / 2;
       if (!labels) return;
       const num = legend.length + 1;
