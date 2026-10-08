@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { SHIP, DECKS, ZONES, TOUR_NODES, CRUISES } from '../data/world-europa.js';
-import { createStage, project } from '../three/stage.js';
+import { startStage, project } from '../three/stage.js';
 import { setupSpaces, nodeEye } from '../three/spaces.js';
 import { Cinematic, CHAPTERS, fmt } from '../three/cinematic.js';
 import { deckPlanSVG, deckPolygons, ZONE_COLORS } from '../ui/deckplan.js';
@@ -44,7 +44,7 @@ deckList.innerHTML = DECKS.slice().reverse().map((d) => `
 // ---------------------------------------------------------------------------
 // Scena 3D.
 
-const stage = await createStage(canvas);
+const stage = await startStage(canvas, $('#loading'));
 const { camera, scene } = stage;
 const spaces = setupSpaces(stage);
 // Su schermi stretti (telefono in verticale) la camera si allontana per far stare la nave.
@@ -407,7 +407,7 @@ function updateCutOnly() {
 new IntersectionObserver((entries, obs) => {
   if (entries.some((e) => e.isIntersecting)) {
     obs.disconnect();
-    nextThumb();
+    spaces.ready.then(nextThumb);
   }
 }, { rootMargin: '300px' }).observe(grid);
 

@@ -1,7 +1,7 @@
 // Tour a bordo in stile Street View: punti collegati, frecce sul pavimento, mappa del ponte.
 import * as THREE from 'three';
 import { SHIP, TOUR_NODES } from '../data/world-europa.js';
-import { createStage, project } from '../three/stage.js';
+import { startStage, project } from '../three/stage.js';
 import { setupSpaces, nodeEye, nodeFloorY } from '../three/spaces.js';
 import { deckPlanSVG } from '../ui/deckplan.js';
 import { ICONS } from '../ui/icons.js';
@@ -14,7 +14,7 @@ const overlay = $('#overlay');
 const byId = Object.fromEntries(TOUR_NODES.map((n) => [n.id, n]));
 const DECKS_WITH_NODES = [...new Set(TOUR_NODES.map((n) => n.deck))].sort((a, b) => a - b);
 
-const stage = await createStage(canvas, { fov: 75 });
+const stage = await startStage(canvas, $('#loading'), { fov: 75 });
 const { camera, scene } = stage;
 camera.near = 0.1;
 camera.updateProjectionMatrix();
@@ -475,4 +475,5 @@ function nextThumb() {
   strip.querySelector(`img[data-thumb="${n.id}"]`).src = url;
   setTimeout(nextThumb, 80);
 }
-if (!window.__noThumbs) setTimeout(nextThumb, 400);
+// Le miniature partono quando arredi e interni sono pronti, così le anteprime sono complete.
+if (!window.__noThumbs) spaces.ready.then(() => setTimeout(nextThumb, 300));

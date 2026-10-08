@@ -26,6 +26,31 @@ async function loadShip() {
   return buildShip();
 }
 
+// Avvio sicuro per le pagine: se il 3D non parte, al posto del caricamento compare un messaggio chiaro.
+export async function startStage(canvas, loadingEl, opts) {
+  try {
+    // Le insegne disegnate su canvas usano i font del sito: aspettiamo che siano caricati.
+    await document.fonts?.ready;
+    return await createStage(canvas, opts);
+  } catch (err) {
+    console.error(err);
+    const webgl = !hasWebGL();
+    loadingEl.classList.add('fatal');
+    loadingEl.innerHTML = webgl
+      ? '<p><b>Il tuo dispositivo non supporta la grafica 3D (WebGL).</b><br>Prova con una versione aggiornata di Chrome, Safari, Edge o Firefox, oppure attiva l’accelerazione hardware.</p>'
+      : '<p><b>Non è stato possibile caricare la nave 3D.</b><br>Controlla la connessione e ricarica la pagina.</p><button type="button" class="btn btn-amber" onclick="location.reload()">Ricarica</button>';
+    throw err;
+  }
+}
+
+function hasWebGL() {
+  try {
+    return !!document.createElement('canvas').getContext('webgl2');
+  } catch {
+    return false;
+  }
+}
+
 export async function createStage(canvas, { shadows = true, water = true, fov = 35 } = {}) {
   const renderer = createRenderer(canvas);
   renderer.shadowMap.enabled = shadows;

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { SHIP, CRUISES, TOUR_NODES } from '../data/world-europa.js';
-import { createStage, project } from '../three/stage.js';
+import { startStage, project } from '../three/stage.js';
 import { nodeEye } from '../three/spaces.js';
 import { ICONS } from '../ui/icons.js';
 
@@ -37,7 +37,7 @@ $('#cards').innerHTML = `
 
 // Palcoscenico 3D: la nave ruota lentamente; i segnaposto portano nel tour.
 const canvas = $('#hero-canvas');
-const stage = await createStage(canvas, { fov: 30 });
+const stage = await startStage(canvas, $('#loading'), { fov: 30 });
 const { camera, ship } = stage;
 const target = new THREE.Vector3(0, 22, 0);
 let angle = 0.75;
@@ -87,10 +87,10 @@ stage.onTick((dt) => {
 });
 
 // Immagini generate dal modello.
-setTimeout(() => {
+stage.propsReady.then(() => {
   $('#card-shot').src = stage.snapshot(new THREE.Vector3(250, 70, 230), new THREE.Vector3(10, 22, 0), { width: 720, height: 405, fov: 35 });
   const n = TOUR_NODES.find((k) => k.id === 'promenade-mid');
   const eye = nodeEye(n);
   $('#tour-shot').src = stage.snapshot(eye, eye.clone().add(new THREE.Vector3(1, 0.06, 0)), { width: 960, height: 600, fov: 75 });
   window.__ready = true;
-}, 300);
+});
