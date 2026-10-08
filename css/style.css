@@ -267,7 +267,8 @@ h2 { font-size: clamp(28px, 3.4vw, 40px); line-height: 1.12; }
 .where h1 { font-size: 24px; }
 .where p { margin: 0; font-size: 15px; color: #c9d3e2; }
 .heading { left: 50%; top: 20px; transform: translateX(-50%); display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-radius: 999px; font-size: 14px; white-space: nowrap; }
-.heading .hint { color: var(--muted-dark); }
+.heading .hint { color: var(--muted-dark); display: inline-flex; align-items: center; gap: 8px; }
+.heading .sep-v { width: 1px; height: 18px; background: var(--line-dark); }
 .tools { right: 20px; top: 20px; display: flex; flex-direction: column; gap: 4px; padding: 6px; border-radius: 16px; }
 .tools button { width: 48px; height: 48px; border: 0; border-radius: 10px; background: transparent; color: var(--white); display: grid; place-items: center; cursor: pointer; }
 .tools button:hover { background: rgba(255, 255, 255, 0.08); }
@@ -305,13 +306,20 @@ h2 { font-size: clamp(28px, 3.4vw, 40px); line-height: 1.12; }
 
 @media (max-width: 900px) {
   .heading .hint, .heading .sep-v { display: none; }
-  .strip { left: 12px; right: 12px; bottom: 12px; max-width: none; }
-  .minimap { left: 12px; bottom: 140px; width: auto; right: 12px; }
-  .minimap svg { max-height: 90px; }
-  .where { left: 12px; top: 12px; width: calc(100% - 92px); }
+  .where { left: 12px; top: 12px; width: calc(100% - 92px); padding: 12px 14px; gap: 4px; }
   .where h1 { font-size: 20px; }
+  .where p { font-size: 13px; }
   .tools { right: 12px; top: 12px; }
-  .heading { top: auto; bottom: 330px; }
+  .tools button { width: 44px; height: 44px; }
+  .heading { left: 12px; top: 132px; bottom: auto; transform: none; padding: 8px 12px; font-size: 13px; }
+  .minimap { left: 12px; right: 12px; bottom: 114px; width: auto; padding: 10px 12px; gap: 6px; }
+  .minimap svg { max-height: 54px; }
+  .minimap .legend { display: none; }
+  .strip { left: 12px; right: 12px; bottom: 12px; max-width: none; padding: 8px; gap: 8px; }
+  .strip button { width: 96px; }
+  .strip img { height: 44px; }
+  .strip span { font-size: 12px; padding: 4px 6px 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .strip small { display: none; }
   .hotspot .card-info { width: 220px; }
 }
 @media (max-width: 640px) {
