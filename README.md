@@ -96,6 +96,17 @@ Ogni nodo in `TOUR_NODES` può avere `photo: 'assets/360/<id>.jpg'`: un'immagine
 
 I dati sono quelli pubblici di queste fonti; le posizioni dei locali sono indicative.
 
+## Oggetti e materiali reali
+
+- Arredi e piante: modelli fotogrammetrici Poly Haven (CC0) caricati da `js/three/assets.js` e posizionati in `js/ship/props.js`.
+- Ponti in teak, marmo, legno, velluto e piastrelle: texture PBR fotografiche Poly Haven (CC0).
+- Cielo e riflessi: HDRI fotografico; la direzione del sole è calcolata dall'immagine, così luce, ombre e riflessi coincidono.
+- World Promenade: palme LED in acciaio alle due estremità e verde lungo le pareti, come descritto nei materiali di lancio della nave.
+- Vetrine della World Galleria: foto reali di negozi (Pexels).
+- Le foto e i panorami del [tour ufficiale MSC](https://virtual-tours.msccruises.com/MSC-world-europa/it-it/index.html) sono di MSC e non sono inclusi: il sito ci rimanda con un link. Con l'autorizzazione di MSC, i loro panorami equirettangolari si collegano ai punti del tour tramite il campo `photo` (vedi sopra).
+
+Elenco completo e licenze: [`assets/CREDITS.md`](assets/CREDITS.md).
+
 ## Licenze
 
 - Three.js: licenza MIT, testo in `vendor/three/LICENSE`.

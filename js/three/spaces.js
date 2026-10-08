@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { deckY } from '../data/world-europa.js';
 import { buildInteriors } from '../ship/interiors.js';
+import { loadInteriorProps } from '../ship/props.js';
 
 export const EYE = 1.65;
 
@@ -19,7 +20,9 @@ export function setupSpaces(stage) {
   const { interior, theatre } = buildInteriors();
   interior.visible = theatre.visible = false;
   scene.add(interior, theatre);
+  const ready = Promise.all([stage.propsReady, loadInteriorProps({ interior, theatre })]).catch((err) => console.warn('Arredi interni non caricati', err));
   const skyEnv = scene.environment;
+  const skyEnvIntensity = scene.environmentIntensity;
   const pmrem = new THREE.PMREMGenerator(renderer);
   const roomEnv = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
   let current = 'exterior';
@@ -35,12 +38,13 @@ export function setupSpaces(stage) {
     interior.visible = space === 'interior';
     theatre.visible = space === 'theatre';
     scene.environment = outside ? skyEnv : roomEnv;
-    scene.environmentIntensity = outside ? 1 : 0.45;
+    scene.environmentIntensity = outside ? skyEnvIntensity : 0.45;
     scene.background = outside ? null : new THREE.Color(0x0a1a2f);
   }
 
   return {
     set,
+    ready,
     get current() { return current; },
     interior,
     theatre,

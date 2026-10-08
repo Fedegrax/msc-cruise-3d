@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { SHIP } from '../data/world-europa.js';
 import { buildShip } from '../ship/model.js';
+import { loadExteriorProps } from '../ship/props.js';
 import { createRenderer, createOutdoor } from './environment.js';
 
 async function loadShip() {
@@ -29,16 +30,22 @@ export async function createStage(canvas, { shadows = true, water = true, fov = 
   const renderer = createRenderer(canvas);
   renderer.shadowMap.enabled = shadows;
   const scene = new THREE.Scene();
-  const outdoor = createOutdoor(scene, renderer, { water });
+  const outdoor = await createOutdoor(scene, renderer, { water });
   const ship = await loadShip();
   scene.add(ship);
 
   const camera = new THREE.PerspectiveCamera(fov, 1, 0.3, 60000);
   const clipPlane = new THREE.Plane(new THREE.Vector3(0, -1, 0), 1e6);
-  for (const m of ship.userData.materials) {
-    m.clippingPlanes = [clipPlane];
-    m.clipShadows = true;
-  }
+  const clipAll = () => ship.traverse((o) => {
+    if (!o.isMesh) return;
+    for (const m of [].concat(o.material)) {
+      m.clippingPlanes = [clipPlane];
+      m.clipShadows = true;
+    }
+  });
+  clipAll();
+  // Arredi e oggetti reali: arrivano dopo, senza bloccare la prima immagine.
+  const propsReady = (SHIP.gltf ? Promise.resolve() : loadExteriorProps(ship)).then(clipAll).catch((err) => console.warn('Arredi non caricati', err));
 
   const tickers = new Set();
   let visible = true;
@@ -71,7 +78,7 @@ export async function createStage(canvas, { shadows = true, water = true, fov = 
   });
 
   return {
-    renderer, scene, camera, ship, outdoor,
+    renderer, scene, camera, ship, outdoor, propsReady,
     onTick(f) { tickers.add(f); return () => tickers.delete(f); },
     // Taglia la nave sopra la quota y (null = nave intera).
     setCut(y) { clipPlane.constant = y == null ? 1e6 : y; },

@@ -7,7 +7,8 @@ import {
   halfBreadth, bottomY, hullTop, STRUCTURES, outlinePolygon, footprintAt, sampleRange,
   LIFEBOATS, SPIRAL, FUNNEL, POOLS, JACUZZIS, BOTANIC_ROOF,
 } from './geometry.js';
-import { hullTextures, transomTexture, facadeTextures, deckTexture, HULL_TEX_TOP } from './textures.js';
+import { hullTextures, transomTexture, facadeTextures, HULL_TEX_TOP } from './textures.js';
+import { pbr, texture } from '../three/assets.js';
 
 export function buildShip() {
   const ship = new THREE.Group();
@@ -25,7 +26,6 @@ export function buildShip() {
   ship.add(buildSlides(M));
   ship.add(buildPools(M));
   ship.add(buildBotanicRoof(M));
-  ship.add(buildDeckFurniture(M));
 
   ship.traverse((o) => {
     if (o.isMesh) {
@@ -40,7 +40,6 @@ export function buildShip() {
 
 function createMaterials() {
   const hull = hullTextures();
-  const deck = deckTexture();
   const std = (opts) => new THREE.MeshStandardMaterial({ side: THREE.DoubleSide, ...opts });
   const facade = (kind) => {
     const t = facadeTextures(kind);
@@ -51,7 +50,8 @@ function createMaterials() {
     white: std({ color: 0xf1f3f5, roughness: 0.55 }),
     transom: std({ map: transomTexture(), roughness: 0.5 }),
     steelDeck: std({ color: 0x9aa4ab, roughness: 0.85 }),
-    teak: std({ map: deck, roughness: 0.8 }),
+    // Teak con giunti neri (texture fotografica PBR, 1 m per ripetizione).
+    teak: pbr('brown_planks_05', 1, { roughness: 0.9, color: 0xe2c9a6 }),
     balcony: facade('balcony'),
     public: facade('public'),
     glassFacade: facade('glass'),
@@ -65,12 +65,12 @@ function createMaterials() {
     slideYellow: std({ color: 0xf2c230, roughness: 0.3 }),
     slideBlue: std({ color: 0x2a7fd4, roughness: 0.3 }),
     slideRed: std({ color: 0xd8443a, roughness: 0.3 }),
-    poolTile: std({ color: 0xe9f1f4, roughness: 0.4 }),
-    water: new THREE.MeshStandardMaterial({ color: 0x2aa7d8, roughness: 0.04, metalness: 0.1, emissive: 0x0a5e86, emissiveIntensity: 0.35 }),
-    lounger: std({ color: 0xf6f6f2, roughness: 0.6 }),
-    umbrella: std({ color: 0xf2b544, roughness: 0.7 }),
-    plant: std({ color: 0x3f7a4a, roughness: 0.9 }),
-    trunk: std({ color: 0x6b4e35, roughness: 0.9 }),
+    poolTile: std({ color: 0xf2f4f3, roughness: 0.55 }),
+    poolBasin: pbr('long_white_tiles', 1.27, { roughness: 0.4, color: 0x8fd3ea }),
+    water: new THREE.MeshStandardMaterial({
+      color: 0x1fa4d6, transparent: true, opacity: 0.62, roughness: 0.03, metalness: 0.15,
+      normalMap: texture('textures/waternormals.jpg', { srgb: false, repeat: 0.25 }), normalScale: new THREE.Vector2(0.35, 0.35),
+    }),
     dark: std({ color: 0x23303d, roughness: 0.5, metalness: 0.4 }),
     radome: std({ color: 0xf7f8fa, roughness: 0.3 }),
   };
@@ -430,10 +430,19 @@ function buildSlides(M) {
   return g;
 }
 
+// Piano con UV in metri (per le texture fotografiche).
+function planeM(w, d) {
+  const g = new THREE.PlaneGeometry(w, d);
+  const uv = g.attributes.uv;
+  for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * w, uv.getY(i) * d);
+  return g;
+}
+
 function buildPools(M) {
   const g = new THREE.Group();
   g.name = 'pools';
   const rim = [];
+  const basin = [];
   const water = [];
   for (const p of POOLS) {
     const w = p.x[1] - p.x[0];
@@ -447,13 +456,20 @@ function buildPools(M) {
       box(w + 2 * t, t, cx, p.z[0] - t / 2), box(w + 2 * t, t, cx, p.z[1] + t / 2),
       box(t, d, p.x[0] - t / 2, cz), box(t, d, p.x[1] + t / 2, cz),
     );
-    water.push(new THREE.PlaneGeometry(w, d).rotateX(-Math.PI / 2).translate(cx, p.y + h - 0.12, cz));
+    // Fondo e pareti interne piastrellati, visibili attraverso l'acqua.
+    basin.push(planeM(w, d).rotateX(-Math.PI / 2).translate(cx, p.y + 0.03, cz));
+    for (const [len, x, z, ry] of [[w, cx, p.z[0] + 0.01, 0], [w, cx, p.z[1] - 0.01, Math.PI], [d, p.x[0] + 0.01, cz, Math.PI / 2], [d, p.x[1] - 0.01, cz, -Math.PI / 2]]) {
+      basin.push(planeM(len, h).rotateY(ry).translate(x, p.y + h / 2, z));
+    }
+    water.push(planeM(w, d).rotateX(-Math.PI / 2).translate(cx, p.y + h - 0.12, cz));
   }
   for (const [x, z, y] of JACUZZIS) {
     rim.push(new THREE.CylinderGeometry(2.1, 2.1, 0.6, 32, 1, true).translate(x, y + 0.3, z));
+    basin.push(new THREE.CircleGeometry(2.0, 32).rotateX(-Math.PI / 2).translate(x, y + 0.04, z));
     water.push(new THREE.CircleGeometry(2.0, 32).rotateX(-Math.PI / 2).translate(x, y + 0.48, z));
   }
   g.add(new THREE.Mesh(mergeGeometries(rim), M.poolTile));
+  g.add(new THREE.Mesh(mergeGeometries(basin), M.poolBasin));
   g.add(new THREE.Mesh(mergeGeometries(water), M.water));
   return g;
 }
@@ -481,49 +497,6 @@ function buildBotanicRoof(M) {
     ribs.push(new THREE.CylinderGeometry(0.12, 0.12, len, 6).rotateZ(Math.PI / 2).translate((x[0] + x[1]) / 2, y, z));
   }
   g.add(new THREE.Mesh(mergeGeometries(ribs), M.frame));
-  return g;
-}
-
-// Lettini, ombrelloni e piante: danno scala umana ai ponti scoperti.
-function buildDeckFurniture(M) {
-  const g = new THREE.Group();
-  g.name = 'furniture';
-  const loungers = [];
-  const add = (x, y, z, rot = Math.PI / 2) => loungers.push(new THREE.Matrix4().compose(
-    new THREE.Vector3(x, y + 0.2, z), new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), rot), new THREE.Vector3(1, 1, 1),
-  ));
-  const y18 = deckY(18);
-  for (let x = 26; x <= 52; x += 1.5) for (const z of [-12.2, -14.6, 12.2, 14.6]) add(x, y18, z);
-  for (let x = -2; x <= 18; x += 1.5) for (const z of [-11.4, -13.8, 11.4, 13.8]) add(x, y18, z);
-  for (let x = -158; x <= -132; x += 1.5) for (const z of [11.4, 20.8, -11.4, -20.8]) add(x, y18, z);
-  for (let x = 64; x <= 84; x += 1.5) for (const z of [-7, -9.4, 7, 9.4]) add(x, deckY(22), z);
-  for (let x = 24; x <= 52; x += 1.5) add(x, deckY(20), -19.5);
-  const lounger = new THREE.BoxGeometry(1.9, 0.3, 0.75);
-  const lm = new THREE.InstancedMesh(lounger, M.lounger, loungers.length);
-  loungers.forEach((m, i) => lm.setMatrixAt(i, m));
-  g.add(lm);
-
-  // World Promenade: tavolini con ombrellone e fioriere lungo le due ali.
-  const y8 = deckY(8);
-  const pole = [];
-  const top = [];
-  const trunks = [];
-  const crowns = [];
-  for (let x = -154; x <= -86; x += 7) {
-    for (const z of [-6.2, 6.2]) {
-      pole.push(new THREE.CylinderGeometry(0.05, 0.05, 2.4, 6).translate(x, y8 + 1.2, z));
-      top.push(new THREE.ConeGeometry(1.5, 0.6, 12).translate(x, y8 + 2.5, z));
-      pole.push(new THREE.CylinderGeometry(0.5, 0.5, 0.08, 16).translate(x, y8 + 0.75, z));
-    }
-    const pz = ((x + 154) / 7) % 2 ? 3.4 : -3.4;
-    trunks.push(new THREE.CylinderGeometry(0.12, 0.18, 3.4, 8).translate(x + 3.5, y8 + 1.7, pz));
-    crowns.push(new THREE.IcosahedronGeometry(1.0, 2).scale(1, 0.85, 1).translate(x + 3.5, y8 + 3.7, pz));
-    pole.push(new THREE.CylinderGeometry(0.8, 0.7, 0.6, 16).translate(x + 3.5, y8 + 0.3, pz));
-  }
-  g.add(new THREE.Mesh(mergeGeometries(pole), M.frame));
-  g.add(new THREE.Mesh(mergeGeometries(top), M.umbrella));
-  g.add(new THREE.Mesh(mergeGeometries(trunks), M.trunk));
-  g.add(new THREE.Mesh(mergeGeometries(crowns), M.plant));
   return g;
 }
 

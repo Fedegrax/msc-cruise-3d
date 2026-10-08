@@ -3,7 +3,9 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { deckY } from '../data/world-europa.js';
-import { signTexture, marbleTexture, ledSkyTexture, shopWindowTexture } from './textures.js';
+import { signTexture, ledSkyTexture, shopWindowTexture } from './textures.js';
+import { pbr } from '../three/assets.js';
+import { shopPhoto } from './props.js';
 
 const Y6 = deckY(6);
 const Y7 = deckY(7);
@@ -18,11 +20,12 @@ const VENUES = [
 ];
 
 function mats() {
-  const marble = marbleTexture();
   return {
-    marble: new THREE.MeshStandardMaterial({ map: marble, roughness: 0.18, metalness: 0.05 }),
+    marble: pbr('marble_01', 1.5, { roughness: 0.35 }),
     wall: new THREE.MeshStandardMaterial({ color: 0xd9cdbd, roughness: 0.7, side: THREE.DoubleSide }),
-    wood: new THREE.MeshStandardMaterial({ color: 0x5e3f27, roughness: 0.45, side: THREE.DoubleSide }),
+    wood: pbr('teak_veneer', 1.2, { roughness: 0.75, color: 0xc9a07a }),
+    bronze: new THREE.MeshStandardMaterial({ color: 0x3a3128, roughness: 0.35, metalness: 0.85 }),
+    vitrine: new THREE.MeshStandardMaterial({ color: 0xdfeef5, transparent: true, opacity: 0.12, roughness: 0.02, metalness: 0.9, side: THREE.DoubleSide, depthWrite: false }),
     slab: new THREE.MeshStandardMaterial({ color: 0xf4efe7, roughness: 0.6, emissive: 0xb8ab98, emissiveIntensity: 0.22 }),
     ceiling: new THREE.MeshStandardMaterial({ color: 0xf2ece2, roughness: 0.8, side: THREE.DoubleSide }),
     glass: new THREE.MeshStandardMaterial({ color: 0xbcd8e6, transparent: true, opacity: 0.25, roughness: 0.02, metalness: 0.6, side: THREE.DoubleSide, depthWrite: false }),
@@ -222,20 +225,36 @@ function buildGalleria(M) {
     }
   }
   // Vetrine e insegne su tre livelli, entrambi i lati.
+  const frames = [];
+  const glass = [];
+  const plinths = [];
   let k = 0;
   for (const y of [Y6, Y7, Y8]) {
     for (const sgn of [1, -1]) {
       for (let x = X0 + 4; x < X1 - 3; x += 7.5) {
         const name = VENUES[k % VENUES.length];
-        const win = new THREE.Mesh(new THREE.PlaneGeometry(6.2, 2.4), new THREE.MeshBasicMaterial({ map: shopWindowTexture(k + 1) }));
+        const win = new THREE.Mesh(new THREE.PlaneGeometry(6.2, 2.4), shopPhoto(name, shopWindowTexture(k + 1)));
         win.position.set(x, y + 1.35, sgn * (Z - 0.16));
         win.rotation.y = sgn > 0 ? Math.PI : 0;
         g.add(win);
         g.add(sign(name, 5.6, 0.55, x, y + 2.85, sgn * (Z - 0.17), sgn > 0 ? Math.PI : 0, { bg: '#0f1d31', fg: '#f3e2bf' }));
+        // Vetrina: telaio in bronzo, vetro a 0,75 m dalla parete, ingresso a destra e piedistalli.
+        const zg = sgn * (Z - 0.75);
+        frames.push(
+          box(6.6, 0.12, 0.8, x, y + 2.62, sgn * (Z - 0.4)), box(0.12, 2.6, 0.8, x - 3.25, y + 1.3, sgn * (Z - 0.4)),
+          box(0.12, 2.6, 0.8, x + 3.25, y + 1.3, sgn * (Z - 0.4)), box(0.08, 2.5, 0.08, x + 0.9, y + 1.25, zg),
+          box(6.5, 0.08, 0.8, x, y + 0.04, sgn * (Z - 0.4)),
+        );
+        glass.push(new THREE.PlaneGeometry(4.05, 2.5).translate(x - 1.1, y + 1.25, zg));
+        const odd = Math.round((x - (X0 + 4)) / 7.5) % 2 === 1;
+        if (y === Y6 && odd) plinths.push(box(0.5, 0.9, 0.42, x - 1.5, y + 0.45, sgn * (Z - 0.4)), box(0.5, 0.9, 0.42, x - 0.3, y + 0.45, sgn * (Z - 0.4)));
         k++;
       }
     }
   }
+  g.add(new THREE.Mesh(mergeGeometries(frames), M.bronze));
+  g.add(new THREE.Mesh(mergeGeometries(glass), M.vitrine));
+  g.add(new THREE.Mesh(mergeGeometries(plinths), M.slab));
   const walls = [
     box(X1 - X0, CEIL - Y6, 0.3, (X0 + X1) / 2, (CEIL + Y6) / 2, Z),
     box(X1 - X0, CEIL - Y6, 0.3, (X0 + X1) / 2, (CEIL + Y6) / 2, -Z),
@@ -282,8 +301,8 @@ function buildTheatre(M) {
   const halfAt = (x) => 17 - ((x - X0) / (X1 - X0)) * 4;
 
   const dark = new THREE.MeshStandardMaterial({ color: 0x1b1f2e, roughness: 0.9, side: THREE.DoubleSide });
-  const carpet = new THREE.MeshStandardMaterial({ color: 0x3a1d2b, roughness: 0.95 });
-  const velvet = new THREE.MeshStandardMaterial({ color: 0x8e1f2b, roughness: 0.75 });
+  const carpet = pbr('velour_velvet', 0.8, { color: 0x5e3346 });
+  const velvet = pbr('velour_velvet', 0.35);
   const curtain = new THREE.MeshStandardMaterial({ color: 0x6d0f1c, roughness: 0.8 });
 
   // Involucro (pianta rastremata verso prua).

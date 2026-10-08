@@ -182,73 +182,6 @@ export function facadeTextures(kind) {
   return { map, rm };
 }
 
-// Doghe di teak per i ponti scoperti (UV in metri).
-export function deckTexture() {
-  const [c, g] = canvas(512, 512);
-  g.fillStyle = '#b48d63';
-  g.fillRect(0, 0, 512, 512);
-  for (let i = 0; i < 32; i++) {
-    const y = i * 16;
-    g.fillStyle = i % 2 ? '#ad865d' : '#b99268';
-    g.fillRect(0, y, 512, 15);
-    g.fillStyle = '#6f5338';
-    g.fillRect(0, y + 15, 512, 1);
-    const off = (i * 97) % 512;
-    g.fillRect(off, y, 1, 15);
-  }
-  const t = toTexture(c, { repeat: true });
-  t.repeat.set(1 / 8, 1 / 8);
-  return t;
-}
-
-// Mappa normale piastrellabile per l'acqua (rumore frattale con avvolgimento ai bordi).
-export function waterNormals() {
-  const N = 512;
-  const [c, g] = canvas(N, N);
-  const img = g.createImageData(N, N);
-  let seed = 11;
-  const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
-  const octaves = [8, 16, 32, 64].map((cells, o) => {
-    const grid = Float32Array.from({ length: cells * cells }, rnd);
-    return { cells, grid, amp: 1 / Math.pow(1.9, o) };
-  });
-  const fade = (t) => t * t * (3 - 2 * t);
-  const height = new Float32Array(N * N);
-  for (let y = 0; y < N; y++) {
-    for (let x = 0; x < N; x++) {
-      let v = 0;
-      for (const { cells, grid, amp } of octaves) {
-        const fx = (x / N) * cells;
-        const fy = (y / N) * cells;
-        const x0 = Math.floor(fx);
-        const y0 = Math.floor(fy);
-        const tx = fade(fx - x0);
-        const ty = fade(fy - y0);
-        const at = (i, j) => grid[((j + cells) % cells) * cells + ((i + cells) % cells)];
-        const a = at(x0, y0) + (at(x0 + 1, y0) - at(x0, y0)) * tx;
-        const b = at(x0, y0 + 1) + (at(x0 + 1, y0 + 1) - at(x0, y0 + 1)) * tx;
-        v += (a + (b - a) * ty) * amp;
-      }
-      height[y * N + x] = v;
-    }
-  }
-  const H = (x, y) => height[((y + N) % N) * N + ((x + N) % N)];
-  for (let y = 0; y < N; y++) {
-    for (let x = 0; x < N; x++) {
-      const dx = (H(x + 1, y) - H(x - 1, y)) * 18;
-      const dy = (H(x, y + 1) - H(x, y - 1)) * 18;
-      const len = Math.hypot(dx, dy, 1);
-      const i = (y * N + x) * 4;
-      img.data[i] = (-dx / len * 0.5 + 0.5) * 255;
-      img.data[i + 1] = (-dy / len * 0.5 + 0.5) * 255;
-      img.data[i + 2] = (1 / len * 0.5 + 0.5) * 255;
-      img.data[i + 3] = 255;
-    }
-  }
-  g.putImageData(img, 0, 0);
-  return toTexture(c, { srgb: false, repeat: true });
-}
-
 // Pannello con testo (insegne dei locali negli interni).
 export function signTexture(text, { bg = '#0A1A2F', fg = '#F2B544', w = 1024, h = 160, font = '600 76px Figtree, sans-serif' } = {}) {
   const [c, g] = canvas(w, h);
@@ -265,38 +198,6 @@ export function signTexture(text, { bg = '#0A1A2F', fg = '#F2B544', w = 1024, h 
   }
   g.fillText(text, w / 2, h / 2 + 4);
   return toTexture(c);
-}
-
-// Marmo chiaro con venature (pavimenti interni).
-export function marbleTexture() {
-  const [c, g] = canvas(1024, 1024);
-  g.fillStyle = '#ece6dc';
-  g.fillRect(0, 0, 1024, 1024);
-  let seed = 7;
-  const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
-  for (let i = 0; i < 70; i++) {
-    g.strokeStyle = `rgba(150,140,125,${0.08 + rnd() * 0.2})`;
-    g.lineWidth = 1 + rnd() * 2.5;
-    g.beginPath();
-    let x = rnd() * 1024;
-    let y = rnd() * 1024;
-    g.moveTo(x, y);
-    for (let k = 0; k < 8; k++) {
-      x += (rnd() - 0.3) * 160;
-      y += (rnd() - 0.5) * 160;
-      g.lineTo(x, y);
-    }
-    g.stroke();
-  }
-  g.strokeStyle = 'rgba(120,110,95,0.35)';
-  g.lineWidth = 2;
-  for (let i = 0; i <= 1024; i += 256) {
-    g.beginPath(); g.moveTo(i, 0); g.lineTo(i, 1024); g.stroke();
-    g.beginPath(); g.moveTo(0, i); g.lineTo(1024, i); g.stroke();
-  }
-  const t = toTexture(c, { repeat: true });
-  t.repeat.set(1 / 4, 1 / 4);
-  return t;
 }
 
 // Cielo per la cupola LED della World Galleria.
