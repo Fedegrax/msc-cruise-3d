@@ -313,7 +313,7 @@ h2 { font-size: clamp(28px, 3.4vw, 40px); line-height: 1.12; }
   .where p { font-size: 13px; }
   .tools { right: 12px; top: 12px; }
   .tools button { width: 44px; height: 44px; }
-  .heading { left: 12px; top: 132px; bottom: auto; transform: none; padding: 8px 12px; font-size: 13px; }
+  .heading { display: none; }
   .minimap { left: 12px; right: 12px; bottom: 114px; width: auto; padding: 10px 12px; gap: 6px; }
   .minimap svg { max-height: 54px; }
   .minimap .legend { display: none; }

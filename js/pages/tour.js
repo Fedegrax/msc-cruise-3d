@@ -258,7 +258,12 @@ stage.onTick((dt) => {
     const s = project(l.p, camera, canvas);
     const show = s.visible && arrows.visible;
     l.el.style.display = show ? '' : 'none';
-    if (show) l.el.style.transform = `translate(${s.x}px, ${s.y + 34}px) translate(-50%, -50%)`;
+    if (show) {
+      // L'etichetta resta dentro lo schermo anche quando la freccia è al bordo.
+      const half = l.el.offsetWidth / 2 + 8;
+      const x = Math.min(Math.max(s.x, half), canvas.clientWidth - half);
+      l.el.style.transform = `translate(${x}px, ${s.y + 34}px) translate(-50%, -50%)`;
+    }
   }
   for (const h of hotspots) {
     const s = project(h.p, camera, canvas);

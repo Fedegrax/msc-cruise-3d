@@ -1,5 +1,7 @@
 # Deckview
 
+**Online:** https://fedegrax.github.io/msc-cruise-3d/
+
 Concept di sito statico (nessun build step) per esplorare le navi MSC Crociere in 3D, con video tour, piani ponte e una passeggiata a bordo a 360°. Oggi c'è una sola nave: MSC World Europa.
 
 ## Pagine
@@ -36,7 +38,12 @@ Il file `.nojekyll` è già presente: GitHub Pages pubblica i file così come so
 ├── index.html            home e catalogo crociere
 ├── nave.html             modello 3D, video tour, piani ponte
 ├── tour.html             tour a bordo a 360°
+├── crediti.html          crediti, fonti e licenze
+├── 404.html              pagina non trovata (GitHub Pages)
+├── og.jpg                anteprima per i social, renderizzata dal modello
 ├── favicon.svg
+├── fonts/                font self-hosted (OFL), niente richieste esterne
+├── assets/               modelli, texture, cielo HDRI e foto reali (vedi assets/CREDITS.md)
 ├── .nojekyll             disattiva Jekyll su GitHub Pages
 ├── css/
 │   └── style.css         stile unico per tutte le pagine
@@ -47,8 +54,10 @@ Il file `.nojekyll` è già presente: GitHub Pages pubblica i file così come so
 │   │   ├── geometry.js       geometria parametrica pura (scafo, sovrastrutture), condivisa da 3D e piani
 │   │   ├── model.js          modello 3D della nave
 │   │   ├── interiors.js      atrio, World Galleria, World Theatre
+│   │   ├── props.js          arredi reali, palme LED, lettini, ombrelloni, vetrine
 │   │   └── textures.js       texture generate su canvas
 │   ├── three/
+│   │   ├── assets.js         caricamento di texture PBR e modelli glTF reali
 │   │   ├── environment.js    cielo, mare, luci
 │   │   ├── stage.js          scena condivisa, loop di rendering, snapshot; carica il glTF se presente
 │   │   ├── spaces.js         cambio esterno/interni
