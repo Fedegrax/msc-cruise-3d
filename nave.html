@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MSC World Europa in 3D · Deckview</title>
+<meta name="description" content="Esplora la MSC World Europa in 3D: modello navigabile, video tour e piani ponte, poi entra a bordo con il tour a 360°.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script type="importmap">{ "imports": { "three": "./vendor/three/build/three.module.min.js", "three/addons/": "./vendor/three/examples/jsm/" } }</script>
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html">
+      <span class="brand-mark"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><ellipse cx="12" cy="12" rx="9.5" ry="4"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/><path d="M12 2.5v3"/></svg></span>
+      <span class="brand-name"><strong>Deckview</strong><span>Tour virtuali per MSC Crociere</span></span>
+    </a>
+    <nav class="main-nav" aria-label="Principale">
+      <a href="index.html#crociere">Crociere</a>
+      <a href="nave.html" aria-current="page">La nave</a>
+      <a href="tour.html">Tour 360°</a>
+      <a href="index.html#come-funziona">Come funziona</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <nav class="crumbs" aria-label="Percorso">
+      <a href="index.html">Crociere</a><span aria-hidden="true">/</span>
+      <a href="index.html#crociere">Mediterraneo occidentale</a><span aria-hidden="true">/</span>
+      <span aria-current="page">MSC World Europa</span>
+    </nav>
+    <div class="ship-head">
+      <div>
+        <h1>MSC World Europa</h1>
+        <div class="chips">
+          <span>World Class</span><span>333 m · 47 m</span><span>16 ponti passeggeri</span><span>Alimentata a GNL</span>
+        </div>
+      </div>
+      <div class="book">
+        <a class="btn btn-outline" href="tour.html">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg>
+          Entra a bordo 360°</a>
+        <a class="btn btn-amber" href="https://www.msccrociere.it/" rel="noopener" target="_blank">Date e prezzi</a>
+      </div>
+    </div>
+  </div>
+
+  <section aria-label="Visualizzatore della nave" class="wrap">
+    <div class="viewer-row">
+      <div class="viewer" id="viewer">
+        <canvas id="ship-canvas" aria-label="Modello 3D della MSC World Europa: trascina per ruotare, scorri per lo zoom"></canvas>
+        <div class="labels" id="labels"></div>
+        <div class="viewer-top">
+          <div class="tabs" role="tablist" aria-label="Modalità di visualizzazione">
+            <button role="tab" aria-selected="true" data-mode="model" id="tab-model"><span data-icon="cube"></span><span class="lbl">Modello 3D</span></button>
+            <button role="tab" aria-selected="false" data-mode="video" id="tab-video"><span data-icon="video"></span><span class="lbl">Video tour</span></button>
+            <button role="tab" aria-selected="false" data-mode="plan" id="tab-plan"><span data-icon="layers"></span><span class="lbl">Piani ponte</span></button>
+          </div>
+          <span class="view-label" id="view-label"></span>
+        </div>
+
+        <div class="toolbar" id="model-tools" role="toolbar" aria-label="Controlli modello 3D">
+          <button type="button" data-act="rotL" aria-label="Ruota a sinistra"><span data-icon="rotL"></span></button>
+          <button type="button" data-act="rotR" aria-label="Ruota a destra"><span data-icon="rotR"></span></button>
+          <span class="sep"></span>
+          <button type="button" data-act="zoomIn" aria-label="Avvicina"><span data-icon="zoomIn"></span></button>
+          <button type="button" data-act="zoomOut" aria-label="Allontana"><span data-icon="zoomOut"></span></button>
+          <span class="sep"></span>
+          <label class="visually-hidden" for="view-select">Vista</label>
+          <select id="view-select" aria-label="Vista predefinita">
+            <option value="threeQuarter">3/4 di prua</option>
+            <option value="starboard">Fianco di dritta</option>
+            <option value="port">Fianco di babordo</option>
+            <option value="bow">Prua</option>
+            <option value="stern">Poppa</option>
+            <option value="top">Dall’alto</option>
+          </select>
+          <button type="button" class="wide" data-act="cut" aria-pressed="false"><span data-icon="cut"></span>Sezione ponte</button>
+          <button type="button" data-act="full" aria-label="Schermo intero"><span data-icon="full"></span></button>
+        </div>
+
+        <div class="cine" id="cine" hidden>
+          <span class="chapter-title" id="chapter-title"></span>
+          <div class="cine-bar">
+            <button type="button" class="tool" id="cine-play" aria-label="Riproduci"></button>
+            <div class="progress" id="cine-progress" role="slider" aria-label="Avanzamento video" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0"><span class="fill"></span></div>
+            <span class="time" id="cine-time">0:00</span>
+            <button type="button" class="tool" id="cine-rec" aria-label="Registra e scarica il video"></button>
+            <button type="button" class="tool" data-act="full" aria-label="Schermo intero"><span data-icon="full"></span></button>
+          </div>
+        </div>
+
+        <div class="plan" id="plan" hidden>
+          <h2 id="plan-title"></h2>
+          <div id="plan-svg"></div>
+          <div class="plan-legend" id="plan-legend"></div>
+          <ol class="plan-legend" id="plan-zones"></ol>
+          <p class="plan-note">Pianta disegnata dal modello parametrico con le misure reali della nave. Posizione dei locali indicativa, dai piani ponte pubblici.</p>
+        </div>
+
+        <div class="loading" id="loading">Costruzione del modello 3D…</div>
+      </div>
+
+      <aside class="deck-panel" id="side">
+        <div id="side-decks">
+          <h2>Ponti</h2>
+          <p class="lead" style="font-size:14px">Scegli un ponte per evidenziarlo o sezionarlo.</p>
+        </div>
+        <ul class="deck-list" id="deck-list"></ul>
+        <div id="side-chapters" hidden>
+          <h2>Capitoli</h2>
+          <p class="lead" style="font-size:14px">Salta al punto che ti interessa.</p>
+        </div>
+        <ol class="chapter-list" id="chapter-list" hidden></ol>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap" style="display:flex;flex-direction:column;gap:24px">
+      <div class="cta-strip">
+        <div><b>Pronto a salire a bordo?</b><span>Cammina tra World Promenade, piscine, atrio e teatro a 360°.</span></div>
+        <a class="btn btn-amber" href="tour.html">Avvia il tour 360° <span data-icon="arrowRight"></span></a>
+      </div>
+      <div class="section-head" style="margin:24px 0 0">
+        <div>
+          <h2>Da vedere a bordo</h2>
+          <p class="lead">Ogni punto si apre nel tour a 360°, nella posizione reale sulla nave.</p>
+        </div>
+      </div>
+      <div class="poi-grid" id="poi-grid"></div>
+    </div>
+  </section>
+
+  <section class="section white-band">
+    <div class="wrap" style="display:flex;flex-direction:column;gap:32px">
+      <div class="section-head" style="margin:0">
+        <div><span class="eyebrow">Scheda tecnica</span><h2>La nave in numeri</h2></div>
+      </div>
+      <dl class="facts" id="facts"></dl>
+      <div class="box">
+        <h2 style="font-size:26px">Itinerario di esempio · 7 notti</h2>
+        <ol class="itin" id="itin"></ol>
+        <p class="plan-note" style="color:var(--muted)">Date, prezzi e itinerari aggiornati sono sul sito ufficiale MSC Crociere.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Deckview · concept di piattaforma per MSC Crociere, non affiliato a MSC. Modello 3D ricostruito dalle dimensioni pubbliche della nave: non è il progetto ufficiale del cantiere.</p>
+    <a href="tour.html">Tour 360°</a>
+  </div>
+</footer>
+<script type="module" src="js/pages/ship.js"></script>
+</body>
+</html>

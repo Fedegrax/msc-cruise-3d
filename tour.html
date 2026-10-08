@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tour a bordo 360° · MSC World Europa · Deckview</title>
+<meta name="description" content="Cammina a bordo della MSC World Europa come in Street View: frecce sul pavimento, mappa del ponte e punti informativi.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script type="importmap">{ "imports": { "three": "./vendor/three/build/three.module.min.js", "three/addons/": "./vendor/three/examples/jsm/" } }</script>
+</head>
+<body class="tour-body">
+<main class="tour" id="tour">
+  <canvas id="tour-canvas" tabindex="0" aria-label="Vista a 360°: trascina per guardarti intorno, clicca le frecce sul pavimento per muoverti. Tastiera: frecce sinistra/destra per girarti, freccia su per avanzare."></canvas>
+  <div id="overlay"></div>
+  <div class="fade" id="fade"></div>
+
+  <section class="panel where" aria-live="polite">
+    <a href="nave.html"><span data-icon="arrowLeft"></span>Torna alla nave</a>
+    <h1 id="node-name">World Promenade</h1>
+    <p id="node-meta"></p>
+  </section>
+
+  <div class="panel heading" id="heading">
+    <span style="display:inline-flex;align-items:center;gap:8px;color:var(--amber)"><span data-icon="compass"></span><span id="heading-text" style="color:#e3e9f2"></span></span>
+    <span class="sep-v" style="width:1px;height:18px;background:var(--line-dark)"></span>
+    <span class="hint" style="display:inline-flex;align-items:center;gap:8px"><span data-icon="move"></span>Trascina per guardarti intorno</span>
+  </div>
+
+  <div class="panel tools" role="toolbar" aria-label="Controlli vista" aria-orientation="vertical">
+    <button type="button" id="zoom-in" aria-label="Avvicina"><span data-icon="zoomIn"></span></button>
+    <button type="button" id="zoom-out" aria-label="Allontana"><span data-icon="zoomOut"></span></button>
+    <span class="sep"></span>
+    <button type="button" id="full" aria-label="Schermo intero"><span data-icon="full"></span></button>
+    <button type="button" id="gyro" aria-label="Muovi il telefono per guardarti intorno" aria-pressed="false" hidden><span data-icon="gyro"></span></button>
+    <button type="button" id="share" aria-label="Copia il link di questa vista"><span data-icon="share"></span></button>
+  </div>
+
+  <section class="panel minimap" aria-label="Mappa del ponte">
+    <header>
+      <div><b id="map-title">Ponte 8</b><small id="map-step"></small></div>
+      <div class="lift" role="group" aria-label="Ascensore: cambia ponte">
+        <button type="button" id="deck-down" aria-label="Ponte inferiore"><span data-icon="down"></span></button>
+        <span id="deck-num">8</span>
+        <button type="button" id="deck-up" aria-label="Ponte superiore"><span data-icon="up"></span></button>
+      </div>
+    </header>
+    <div id="minimap"></div>
+    <div class="legend"><span>POPPA</span><span style="display:inline-flex;align-items:center;gap:6px"><i style="width:10px;height:10px;border-radius:50%;background:var(--amber);display:inline-block"></i>SEI QUI</span><span>PRUA</span></div>
+  </section>
+
+  <nav class="panel strip" id="strip" aria-label="Ambienti del tour"></nav>
+  <div class="toast" id="toast" role="status" hidden></div>
+  <div class="loading" id="loading">Preparazione del tour…</div>
+</main>
+<script type="module" src="js/pages/tour.js"></script>
+</body>
+</html>

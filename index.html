@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deckview · Esplora la tua nave MSC in 3D e a 360°</title>
+<meta name="description" content="Per ogni crociera, la nave in 3D, il video tour e una passeggiata a bordo a 360° come in Street View. Concept per MSC Crociere.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script type="importmap">{ "imports": { "three": "./vendor/three/build/three.module.min.js", "three/addons/": "./vendor/three/examples/jsm/" } }</script>
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html">
+      <span class="brand-mark"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><ellipse cx="12" cy="12" rx="9.5" ry="4"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/><path d="M12 2.5v3"/></svg></span>
+      <span class="brand-name"><strong>Deckview</strong><span>Tour virtuali per MSC Crociere</span></span>
+    </a>
+    <nav class="main-nav" aria-label="Principale">
+      <a href="#crociere" aria-current="page">Crociere</a>
+      <a href="nave.html">La nave</a>
+      <a href="tour.html">Tour 360°</a>
+      <a href="#come-funziona">Come funziona</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <span class="chip-dark">Modello 3D · Video · Tour 360°</span>
+          <h1>Sali a bordo prima di partire.</h1>
+          <p>Per ogni crociera esplori la tua nave in 3D, guardi il video tour e cammini tra ponti, piscine, ristoranti e teatro a 360°, proprio come in Street View.</p>
+          <div class="actions">
+            <a class="btn btn-amber" href="nave.html">Esplora la nave <span data-icon="arrowRight"></span></a>
+            <a class="btn btn-ghost" href="nave.html#video"><span data-icon="play"></span>Guarda il video tour</a>
+          </div>
+        </div>
+        <ul class="feature-list">
+          <li><span data-icon="cube"></span>Modello 3D con le misure reali della nave</li>
+          <li><span data-icon="video"></span>Video tour a capitoli, scaricabile</li>
+          <li><span data-icon="orbit"></span>Passeggiata a 360° tra ponti e locali</li>
+        </ul>
+      </div>
+      <div class="stage" id="stage">
+        <canvas id="hero-canvas" aria-label="La MSC World Europa in 3D, in rotazione lenta"></canvas>
+        <div id="pins"></div>
+        <span class="stage-hint"><span data-icon="orbit"></span>MSC World Europa · tocca un punto per entrare a bordo</span>
+        <div class="loading" id="loading">Costruzione del modello 3D…</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="crociere" aria-labelledby="crociere-titolo">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Crociere disponibili</span>
+          <h2 id="crociere-titolo">Scegli la crociera, esplora la nave.</h2>
+          <p class="lead">Ogni itinerario porta alla sua nave, navigabile in 3D e a 360°.</p>
+        </div>
+      </div>
+      <div class="cards" id="cards"></div>
+    </div>
+  </section>
+
+  <section class="section white-band" id="come-funziona" aria-labelledby="come-titolo">
+    <div class="wrap">
+      <div class="section-head">
+        <div><span class="eyebrow">Come funziona</span><h2 id="come-titolo">Dalla crociera al ponte, in tre passi.</h2></div>
+      </div>
+      <ol class="steps">
+        <li>
+          <div class="num"><span data-icon="layers"></span><span>01</span></div>
+          <h3>Scegli la crociera</h3>
+          <p>Ogni itinerario è collegato alla sua nave: niente foto generiche, vedi esattamente dove dormirai e mangerai.</p>
+        </li>
+        <li>
+          <div class="num"><span data-icon="cube"></span><span>02</span></div>
+          <h3>Guarda la nave in 3D</h3>
+          <p>Ruota e ingrandisci il modello, seziona un ponte per vedere i locali, oppure avvia il video tour a capitoli.</p>
+        </li>
+        <li>
+          <div class="num"><span data-icon="orbit"></span><span>03</span></div>
+          <h3>Cammina a bordo a 360°</h3>
+          <p>Muoviti con le frecce sul pavimento come in Street View, cambia ponte con l’ascensore e apri i punti informativi.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section dark-band" aria-labelledby="tour-titolo">
+    <div class="wrap split">
+      <div>
+        <span class="eyebrow on-dark">Tour a bordo 360°</span>
+        <h2 id="tour-titolo">Lo Street View della tua nave.</h2>
+        <ul class="dots">
+          <li>Frecce sul pavimento per passare da un punto all’altro</li>
+          <li>Mappa del ponte con la tua posizione e la direzione di vista</li>
+          <li>Punti informativi su piscine, teatro, negozi e servizi</li>
+          <li>Su smartphone guardi intorno muovendo il telefono</li>
+        </ul>
+        <div class="actions"><a class="btn btn-amber" href="tour.html">Prova il tour 360° <span data-icon="arrowRight"></span></a></div>
+      </div>
+      <a class="shot" href="tour.html#promenade-mid" aria-label="Apri il tour 360° della World Promenade"><img id="tour-shot" alt="Anteprima della World Promenade nel tour 360°"></a>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Deckview · concept di piattaforma per MSC Crociere, non affiliato a MSC. Modello 3D ricostruito dalle dimensioni pubbliche della nave: non è il progetto ufficiale del cantiere.</p>
+    <a href="https://www.msccrociere.it/" rel="noopener" target="_blank">msccrociere.it</a>
+  </div>
+</footer>
+<script type="module" src="js/pages/home.js"></script>
+</body>
+</html>
